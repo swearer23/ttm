@@ -29,7 +29,7 @@ async function getThreadWrapper(page) {
 }
 
 async function getThreadContent(wrapper) {
-  const tweetTextContent = await wrapper.locator('div[data-testid="tweetText"]')
+  const tweetTextContent = await wrapper.locator('div[data-testid="tweetText"]').first()
   return await tweetTextContent.innerText();
 }
 
