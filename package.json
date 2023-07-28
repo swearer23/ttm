@@ -1,0 +1,15 @@
+{
+  "name": "ttm",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.36.2"
+  },
+  "dependencies": {
+    "playwright": "^1.36.2"
+  }
+}
