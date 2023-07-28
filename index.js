@@ -4,8 +4,10 @@ import writefile from './writefile.js';
 
 const main = async urlString => {
   // auth_token = '890fc2bd33a605d8ae952f93472946cd4d02a0f9'
-  const path = url.parse(urlString).pathname.split('/').pop();
-  const threadContent = await getThreadContent(urlString);
+  const urlpath = url.parse(urlString).pathname.split('/');
+  const userid = urlpath[1];
+  const path = urlpath.pop();
+  const threadContent = await getThreadContent(urlString, userid);
   writefile(`thread_${path}`, threadContent);
 };
 

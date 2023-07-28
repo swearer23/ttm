@@ -1,8 +1,8 @@
 import { chromium } from 'playwright';
 import cookie from './cookie.js';
 
-async function isThreadEnd(wrapper) {
-  const threadConnectionDiv = await wrapper.locator('div[data-testid="Tweet-User-Avatar"]+div');
+async function isThreadEnd(wrapper, userid) {
+  const threadConnectionDiv = await wrapper.locator(`div[data-testid="UserAvatar-Container-${userid}"]`);
   return (await threadConnectionDiv.count()) > 0
 }
 
@@ -33,10 +33,11 @@ async function getThreadContent(wrapper) {
   return await tweetTextContent.innerText();
 }
 
-export default async url => {
+export default async (url, userid) => {
   let threadContent = []
 
   const [browser, page] = await launchBrowser(url)
+  await page.waitForTimeout(1000);
 
   // iterate locators
   let wrappers = await getThreadWrapper(page)
@@ -45,8 +46,10 @@ export default async url => {
   let do_continue = true
   while (do_continue) {
     for (let wrapper of wrappers) {
-      if (await isThreadEnd(wrapper)) {
+      if (await isThreadEnd(wrapper, userid)) {
         const content = await getThreadContent(wrapper)
+        if (threadContent.includes(content)) continue
+        console.log('scraped content', content)
         threadContent.push(content)
       } else {
         do_continue = false
@@ -54,7 +57,11 @@ export default async url => {
       }
     }
     if (do_continue) {
-      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      await page.waitForTimeout(1000);
+      await page.evaluate(() => {
+        const scrollBy = 2000
+        window.scrollBy(0, scrollBy)
+      });
       await page.waitForTimeout(1000);
       wrappers = await getThreadWrapper(page)
     }
