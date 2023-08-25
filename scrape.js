@@ -1,12 +1,29 @@
 import { chromium } from 'playwright';
 import cookie from './cookie.js';
+import { downloadImage } from './network.js';
 
 async function isThreadEnd(wrapper, userid) {
   const threadConnectionDiv = await wrapper.locator(`div[data-testid="UserAvatar-Container-${userid}"]`);
   return (await threadConnectionDiv.count()) > 0
 }
 
-async function launchBrowser(url) {
+async function detectImage(wrapper, foldername) {
+  const imagewraper = await wrapper.locator('div[data-testid="tweetPhoto"]')
+  if ((await imagewraper.count()) > 0) {
+    const images = await imagewraper.locator('img').all()
+    const srclist = await Promise.all(images.map(async item => await item.getAttribute('src')));
+    srclist.forEach(async src => {
+      await downloadImage(src, `output/${foldername}/${src.split('/').pop().split('?')[0]}.jpg`)
+    });
+    return srclist.map(src => {
+      return `![](./${src.split('/').pop().split('?')[0]}.jpg)`
+    }).join('\n')
+  } else {
+    return null
+  }
+}
+
+export async function launchBrowser(url) {
   const browser = await chromium.launch({headless: false});
   const context = await browser.newContext({
     acceptDownloads: true,
@@ -28,12 +45,13 @@ async function getThreadWrapper(page) {
   return tweetText;
 }
 
-async function getThreadContent(wrapper) {
+async function getThreadContent(wrapper, foldername) {
   const tweetTextContent = await wrapper.locator('div[data-testid="tweetText"]').first()
-  return await tweetTextContent.innerText();
+  const images = await detectImage(wrapper, foldername)
+  return await tweetTextContent.innerText() + '\n' + images;
 }
 
-export default async (url, userid) => {
+export default async (url, userid, foldername) => {
   let threadContent = []
 
   const [browser, page] = await launchBrowser(url)
@@ -42,12 +60,12 @@ export default async (url, userid) => {
   // iterate locators
   let wrappers = await getThreadWrapper(page)
   const mainThread = wrappers.shift()
-  threadContent.push(await getThreadContent(mainThread))
+  threadContent.push(await getThreadContent(mainThread, foldername))
   let do_continue = true
   while (do_continue) {
     for (let wrapper of wrappers) {
       if (await isThreadEnd(wrapper, userid)) {
-        const content = await getThreadContent(wrapper)
+        const content = await getThreadContent(wrapper, foldername)
         if (threadContent.includes(content)) continue
         console.log('scraped content', content)
         threadContent.push(content)
