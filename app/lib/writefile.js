@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { outputPath } from './const';
 
 export const makedir = (dirname) => {
   try {
@@ -12,7 +13,7 @@ export const makedir = (dirname) => {
 
 export default (filename, threadContent) => {
   try {
-    fs.writeFileSync(`output/${filename}`, threadContent.join('\n'), 'utf-8');
+    fs.writeFileSync(`${outputPath}${filename}`, threadContent.join('\n'), 'utf-8');
     console.log(`Thread content written to file. ${filename}`);
   } catch (err) {
     console.error('Error writing thread content to file:', err);

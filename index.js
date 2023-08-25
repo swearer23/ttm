@@ -1,7 +1,7 @@
 import url from 'url';
-import getThreadContent from './scrape.js';
-import writefile, { makedir } from './writefile.js';
-import { getThreadURLArg } from './utils.js';
+import getThreadContent from './app/lib/scrape.js';
+import writefile, { makedir } from './app/lib/writefile.js';
+import { getThreadURLArg } from './app/lib/utils.js';
 
 const main = async () => {
   const urlString = await getThreadURLArg();

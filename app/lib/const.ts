@@ -1,0 +1,1 @@
+export const outputPath = process.cwd() + '/public/output/'

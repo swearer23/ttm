@@ -1,6 +1,7 @@
 import { chromium } from 'playwright';
-import cookie from './cookie.js';
+import cookie from '../../cookie.js';
 import { downloadImage } from './network.js';
+import { outputPath } from './const.ts';
 
 async function isThreadEnd(wrapper, userid) {
   const threadConnectionDiv = await wrapper.locator(`div[data-testid="UserAvatar-Container-${userid}"]`);
@@ -13,7 +14,7 @@ async function detectImage(wrapper, foldername) {
     const images = await imagewraper.locator('img').all()
     const srclist = await Promise.all(images.map(async item => await item.getAttribute('src')));
     srclist.forEach(async src => {
-      await downloadImage(src, `output/${foldername}/${src.split('/').pop().split('?')[0]}.jpg`)
+      await downloadImage(src, `${outputPath}${foldername}/${src.split('/').pop().split('?')[0]}.jpg`)
     });
     return srclist.map(src => {
       return `![](./${src.split('/').pop().split('?')[0]}.jpg)`
@@ -24,7 +25,7 @@ async function detectImage(wrapper, foldername) {
 }
 
 export async function launchBrowser(url) {
-  const browser = await chromium.launch({headless: false});
+  const browser = await chromium.launch({headless: true});
   const context = await browser.newContext({
     acceptDownloads: true,
     viewport: null, // 如果需要，设置视口大小

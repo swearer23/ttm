@@ -10,3 +10,8 @@ export const getThreadURLArg = async () => {
   const twitterUrl = args[0];
   return twitterUrl
 }
+
+export const isURLValid = (url: string): Boolean=> {
+  const twitterThreadRegex = /^https:\/\/twitter\.com\/[^/]+\/status\/\d+$/;
+  return twitterThreadRegex.test(url)
+}

@@ -3,5 +3,7 @@ node_modules/
 /playwright-report/
 /playwright/.cache/
 
-cookie.js
-output/
+# Next.js build
+.next/
+out/
+public/output/
