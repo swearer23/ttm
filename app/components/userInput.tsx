@@ -1,14 +1,30 @@
 'use client';
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation';
 import { FaArrowRight } from 'react-icons/fa';
 import { isURLValid } from '../lib/utils';
 
 export default () => {
   const router = useRouter();
+  const submitBtn = React.createElement('button', { className: 'btn btn-square' }, <FaArrowRight />);
+  const loadingBtn = React.createElement('button', { className: 'btn btn-square btn-disabled' }, <span className="loading loading-spinner"></span>);
+  const [buttonState, setButtonState] = useState(submitBtn);
+  const [inputClass, setInputClass] = useState('input input-bordered input-info w-full');
+  const [isloading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (isloading) {
+      setButtonState(loadingBtn);
+      setInputClass('input input-bordered input-info w-full input-disabled');
+    } else {
+      setButtonState(submitBtn);
+      setInputClass('input input-bordered input-info w-full');
+    }
+  }, [isloading])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
     const input = e.currentTarget.querySelector('input')?.value.trim();
     if (input && isURLValid(input)) {
       const res = await fetch('/api', {
@@ -42,11 +58,9 @@ export default () => {
           <input
             type="text"
             placeholder="paste twitter thread URL here"
-            className="input input-bordered input-info w-full"
+            className={inputClass}
           />
-          <button className="btn btn-square">
-            <FaArrowRight />
-          </button>
+          {buttonState}
         </form>
       </div>
       <dialog id="dialog" className="modal">
