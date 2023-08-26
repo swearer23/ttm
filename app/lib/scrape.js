@@ -56,9 +56,10 @@ async function getThreadWrapper(page) {
 }
 
 async function getThreadContent(wrapper, foldername) {
-  const tweetTextContent = await wrapper.locator('div[data-testid="tweetText"]').first()
+  const tweetText = await wrapper.locator('article[data-testid="tweet"]')
+  let paragraph = ''
+  if (await tweetText.count() > 0) paragraph = await await wrapper.locator('div[data-testid="tweetText"]').first().innerText()
   const images = await detectImage(wrapper, foldername)
-  let paragraph = await tweetTextContent.innerText()
   if (images) paragraph += '\n' + images;
   const videoCover = await detectVideo(wrapper, foldername)
   if (videoCover) paragraph += '\n' + videoCover;
