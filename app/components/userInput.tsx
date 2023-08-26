@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation';
 import { FaArrowRight } from 'react-icons/fa';
 import { isURLValid } from '../lib/utils';
+import Dialog from './modal';
 
 export default () => {
   const router = useRouter();
@@ -11,6 +12,9 @@ export default () => {
   const [buttonState, setButtonState] = useState(submitBtn);
   const [inputClass, setInputClass] = useState('input input-bordered input-info w-full');
   const [isloading, setIsLoading] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalContent, setModalContent] = useState('');
+  const [modalShow, setModalShow] = useState(false);
 
   useEffect(() => {
     if (isloading) {
@@ -22,35 +26,46 @@ export default () => {
     }
   }, [isloading])
 
+  const onCloseDialog = () => {
+    setModalShow(false);
+  }
+
+  const onShowDialog = (title, content) => {
+    setModalTitle(title);
+    setModalContent(content);
+    setModalShow(true);
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     const input = e.currentTarget.querySelector('input')?.value.trim();
     if (input && isURLValid(input)) {
-      const res = await fetch('/api', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ url: input })
-      });
-      const data = await res.json();
-      const redirectUrl = `/article/${data.mdURL}`;
-      router.push(redirectUrl);
+      try {
+        const res = await fetch('/api', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ url: input })
+        });
+        const data = await res.json();
+        const redirectUrl = `/article/${data.mdURL}`;
+        router.push(redirectUrl);
+      } catch (e) {
+        onShowDialog('Sorry', 'Something went wrong, please try again later: ' + e.message);
+      } finally {
+        setIsLoading(false)
+      }
     } else {
       const input = e.currentTarget.querySelector('input')
       if (input) {
         input.value = '';
       }
-      toggleModal();
+      onShowDialog('Sorry', 'It seems the url is not a valid twitter thread URL');
+      setIsLoading(false);
     }
   }
-
-  const toggleModal = () => {
-    const modal = document.getElementById('dialog') as HTMLDialogElement;
-    modal.showModal();
-  }
-
   return (
     <>
       <div className="form-control">
@@ -63,17 +78,13 @@ export default () => {
           {buttonState}
         </form>
       </div>
-      <dialog id="dialog" className="modal">
-        <form method="dialog" className="modal-box">
-          <h3 className="font-bold text-lg">Sorry</h3>
-          <p className="py-4">It seems the url is not a valid twitter thread URL</p>
-          <div className="modal-action">
-            {/* if there is a button in form, it will close the modal */}
-            <button className="btn">Close</button>
-          </div>
-        </form>
-      </dialog>
+      {
+        modalShow ? <Dialog
+        _title={modalTitle}
+        _content={modalContent}
+        onClose={onCloseDialog}
+        /> : null
+      }
     </>
-    
   )
 }

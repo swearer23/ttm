@@ -9,7 +9,7 @@ export async function downloadImage(imageUrl, filePath) {
     response.data.pipe(writer);
 
     return new Promise((resolve, reject) => {
-      writer.on('finish', resolve);
+      writer.on('finish', () => setTimeout(resolve, 100));
       writer.on('error', reject);
     });
   } catch (error) {

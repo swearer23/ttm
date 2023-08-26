@@ -8,6 +8,15 @@ async function isThreadEnd(wrapper, userid) {
   return (await threadConnectionDiv.count()) > 0
 }
 
+async function detectVideo(wrapper, foldername) {
+  const videoComponent = await wrapper.locator('div[data-testid="videoComponent"]')
+  if (await videoComponent.count() < 1) return null
+  const videoContainer = await videoComponent.locator('video').first()
+  const videoPoster = await videoContainer.getAttribute('poster')
+  await downloadImage(videoPoster, `${outputPath}${foldername}/${videoPoster.split('/').pop().split('?')[0]}.jpg`)
+  return `> video cover \n ![](./${videoPoster.split('/').pop().split('?')[0]}.jpg)`
+}
+
 async function detectImage(wrapper, foldername) {
   const imagewraper = await wrapper.locator('div[data-testid="tweetPhoto"]')
   if ((await imagewraper.count()) > 0) {
@@ -25,7 +34,7 @@ async function detectImage(wrapper, foldername) {
 }
 
 export async function launchBrowser(url) {
-  const browser = await chromium.launch({headless: true});
+  const browser = await chromium.launch({headless: false});
   const context = await browser.newContext({
     acceptDownloads: true,
     viewport: null, // 如果需要，设置视口大小
@@ -49,7 +58,11 @@ async function getThreadWrapper(page) {
 async function getThreadContent(wrapper, foldername) {
   const tweetTextContent = await wrapper.locator('div[data-testid="tweetText"]').first()
   const images = await detectImage(wrapper, foldername)
-  return await tweetTextContent.innerText() + '\n' + images;
+  let paragraph = await tweetTextContent.innerText()
+  if (images) paragraph += '\n' + images;
+  const videoCover = await detectVideo(wrapper, foldername)
+  if (videoCover) paragraph += '\n' + videoCover;
+  return paragraph;
 }
 
 export default async (url, userid, foldername) => {
