@@ -6,4 +6,6 @@ node_modules/
 # Next.js build
 .next/
 out/
+public/*.zip
+public/*.pdf
 public/output/
