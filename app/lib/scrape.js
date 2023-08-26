@@ -11,6 +11,7 @@ async function isThreadEnd(wrapper, userid) {
 async function detectVideo(wrapper, foldername) {
   const videoComponent = await wrapper.locator('div[data-testid="videoComponent"]')
   if (await videoComponent.count() < 1) return null
+  if (await videoComponent.locator('video').count() < 1) return null
   const videoContainer = await videoComponent.locator('video').first()
   const videoPoster = await videoContainer.getAttribute('poster')
   await downloadImage(videoPoster, `${outputPath}${foldername}/${videoPoster.split('/').pop().split('?')[0]}.jpg`)
@@ -34,7 +35,8 @@ async function detectImage(wrapper, foldername) {
 }
 
 export async function launchBrowser(url) {
-  const browser = await chromium.launch({headless: false});
+  const headless = process.env.NODE_ENV === 'production' ? true : false;
+  const browser = await chromium.launch({ headless });
   const context = await browser.newContext({
     acceptDownloads: true,
     viewport: null, // 如果需要，设置视口大小

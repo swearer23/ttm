@@ -18,6 +18,7 @@
     "@types/node": "20.5.6",
     "@types/react": "18.2.21",
     "daisyui": "^3.6.1",
+    "supports-color": "^8.1.1",
     "tailwindcss": "^3.3.3",
     "typescript": "5.2.2"
   },
