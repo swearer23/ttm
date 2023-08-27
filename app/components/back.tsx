@@ -19,9 +19,6 @@ export default function Back() {
   return (
     <FadingComponent>
       <div className="join fixed top-10">
-        <button className="btn btn-circle btn-outline join-item" onClick={goback}>
-          <FaArrowLeft />
-        </button>
         <button className="btn btn-circle btn-outline join-item" onClick={gohome}>
           <FaHome />
         </button>
