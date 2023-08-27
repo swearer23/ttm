@@ -4,7 +4,6 @@ import { remark } from 'remark';
 import html from 'remark-html';
 import Back from "../../components/back";
 import Mddl from "../../components/mddl";
-import Pdfdl from "../../components/pdfdl";
 
 export default function Page( { params }: { params: {path: string}}) {
 
@@ -38,7 +37,6 @@ export default function Page( { params }: { params: {path: string}}) {
     <>
       <Back />
       <Mddl sourceDirectory={params.path} />
-      <Pdfdl />
       <article className="prose max-w-none">
         <div dangerouslySetInnerHTML={{ __html: markdownContent }} />
       </article>

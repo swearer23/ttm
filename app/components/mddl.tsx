@@ -14,10 +14,12 @@ export default function Mddl({ sourceDirectory }: { sourceDirectory: string }) {
   return (
     <>
       {
-        markdownUrl ? <a download={true} href={markdownUrl}><button className="btn mr-4">
+        markdownUrl ? 
+        <a download={true} href={markdownUrl}><button className="btn mr-4 btn-accent">
             <SiMarkdown size={24} style={{display: "inline-block"}}/>
-            as Markdown
-          </button></a>
+            Download as Markdown
+          </button>
+        </a>
         : null
       }
     </>
