@@ -15,6 +15,9 @@ export default function Page() {
         <p>
           Here is a simple tool to save a twitter thread to markdown file without calling twitter v2 elevated auth api.
         </p>
+        <p>
+          If you are interested in the history archives I have collected, please visit <a href="/article/list">Thread Archiver</a>.
+        </p>
       </article>
       <div className="divider"></div>
       <div className="flex flex-row justify-center mb-10">

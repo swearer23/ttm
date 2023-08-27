@@ -1,10 +1,8 @@
+"use client";
 import React, { useState, useEffect } from 'react';
 // import './FadingComponent.css'; // Import your CSS file for styling
 
 function FadingComponent({children}: {children: React.ReactNode}) {
-  const goback = () => {
-    window.history.back();
-  }
 
   const [scrollPosition, setScrollPosition] = useState(0);
 
@@ -23,7 +21,7 @@ function FadingComponent({children}: {children: React.ReactNode}) {
   const opacity = 1 - Math.min(scrollPosition / 100, 1);
 
   return (
-    <div className="fading-component" style={{ opacity }} onClick={goback}>
+    <div className="fading-component" style={{ opacity }}>
       {children}
     </div>
   );

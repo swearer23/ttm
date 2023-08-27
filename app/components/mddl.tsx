@@ -1,15 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { SiMarkdown } from 'react-icons/si'
+import { getDownloadPath } from '../api/article/[path]/md-url/route'
 
 export default function Mddl({ sourceDirectory }: { sourceDirectory: string }) {
 
-  const [markdownUrl, setMarkdownUrl] = useState('');
-
-  useEffect(() => {
-    fetch(`/api/article/${sourceDirectory}/md-url`)
-      .then(res => res.json())
-      .then(data => setMarkdownUrl(data.url))
-  }, [sourceDirectory])
+  const markdownUrl = getDownloadPath(sourceDirectory)
 
   return (
     <>

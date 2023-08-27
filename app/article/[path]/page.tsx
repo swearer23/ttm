@@ -1,11 +1,11 @@
-'use client';
-import React, { useEffect, useState } from "react";
+import fs from 'fs';
+import React from "react";
 import { remark } from 'remark';
 import html from 'remark-html';
 import Back from "../../components/back";
 import Mddl from "../../components/mddl";
 
-export default function Page( { params }: { params: {path: string}}) {
+export default async function Page( { params }: { params: {path: string}}) {
 
   const modifyImagePath = (content: string, folderpath: string) => {
     const imgRegex = /<img[^>]+src="([^">]+)"/g;
@@ -17,21 +17,14 @@ export default function Page( { params }: { params: {path: string}}) {
     return newContent;
   }
 
-  const [markdownContent, setMarkdownContent] = useState('');
+  const path = params.path;
+  const content = fs.readFileSync(`${process.cwd()}/public/output/${path}/thread.md`);
+  const processedContent = await remark()
+    .use(html)
+    .process(content);
+  const contentHtml = processedContent.toString();
 
-  useEffect(() => {
-    async function fetchMarkdownContent() {
-      const response = await fetch(`/output/${params.path}/thread.md`);
-      const content = await response.text();
-      const processedContent = await remark()
-        .use(html)
-        .process(content);
-      const contentHtml = processedContent.toString();
-      setMarkdownContent(modifyImagePath(contentHtml, params.path));
-    }
-
-    fetchMarkdownContent();
-  }, []);
+  const markdownContent = modifyImagePath(contentHtml, params.path);
 
   return (
     <>
@@ -42,6 +35,5 @@ export default function Page( { params }: { params: {path: string}}) {
       </article>
       <div className="divider"></div>
     </>
-    
   )
 }
