@@ -6,7 +6,7 @@ import { isURLValid } from '../lib/utils';
 import { outputPath } from '../lib/const';
 
 export async function GET() {
-  return NextResponse.json({ data: 'Hello, World!' })
+  return NextResponse.json({ data: `${process.cwd()}` })
 }
 
 const validate = (urlString: string): Array<string> | NextResponse => {
