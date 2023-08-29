@@ -76,7 +76,7 @@ export default async (url, userid, foldername) => {
   let threadContent = []
 
   const [browser, page] = await launchBrowser(url)
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(5000);
 
   // iterate locators
   let wrappers = await getThreadWrapper(page)
