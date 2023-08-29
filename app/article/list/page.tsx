@@ -1,41 +1,40 @@
-import fs from 'fs';
 import React from "react";
 import Back from "../../components/back";
 import { FaArrowCircleRight } from 'react-icons/fa';
+import { listObjects, getObject } from '../../lib/s3client';
 
-const findPictureInFolder = (folder: string) => {
-  const filelist = fs.readdirSync(folder);
+const findPictureInFolder = async (folder: string) => {
+  const filelist = await listObjects(folder);
   const picture = filelist.find(name => name.endsWith('.jpg'));
-  return picture;
+  return `${process.env.AWS_BUCKET_HOST}/${picture}`;
 }
 
-const traverseAllThreads = () => {
-  const threadList = fs.readdirSync(`${process.cwd()}/public/output`);
-  const threadBriefList = threadList.map(thread => {
-    const mdName = `${process.cwd()}/public/output/${thread}/thread.md`
-    try {
-      fs.accessSync(mdName);
-      return {
-        name: thread,
-        cover: findPictureInFolder(`${process.cwd()}/public/output/${thread}`),
-        brief: fs.readFileSync(mdName, 'utf-8').slice(0, 100)
-      }
-    } catch (err) {
-      return null
-    }
-  }).filter(thread => thread !== null);
+const traverseAllThreads = async () => {
+
+  const threadList = (await listObjects('')).filter(name => name.startsWith('thread') && name.endsWith('/'));
+  const threadBriefList = []
+  for (const thread of threadList) {
+    const mdName = `${thread}thread.md`;
+    const brief = (await (await getObject(mdName)).transformToString()).slice(0, 100);
+    const cover = await findPictureInFolder(thread);
+    threadBriefList.push({
+      name: thread,
+      cover: cover,
+      brief: brief
+    })
+  }
   return threadBriefList.reverse().slice(0, 20);
 }
 
-export default function Page() {
-  const threadBriefList = traverseAllThreads();
+export default async function Page() {
+  const threadBriefList = await traverseAllThreads();
 
   return (
     <>
       <Back />
       {
         threadBriefList.map(thread => {
-          const coverPath = thread.cover ? `/output/${thread.name}/${thread.cover}` : null;
+          const coverPath = `https://${thread.cover}` || null;
           const threadPath = `/article/${thread.name}`;
           return (
             <div className="card lg:card-side bg-base-100 shadow-xl mb-10">

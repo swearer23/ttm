@@ -9,3 +9,4 @@ out/
 public/*.zip
 public/*.pdf
 public/output/
+.env

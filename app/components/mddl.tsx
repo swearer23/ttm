@@ -2,9 +2,9 @@ import React from 'react'
 import { SiMarkdown } from 'react-icons/si'
 import { getDownloadPath } from '../api/article/[path]/md-url/route'
 
-export default function Mddl({ sourceDirectory }: { sourceDirectory: string }) {
+export default async function Mddl({ sourceDirectory }: { sourceDirectory: string }) {
 
-  const markdownUrl = getDownloadPath(sourceDirectory)
+  const markdownUrl = `${await getDownloadPath(sourceDirectory)}`
 
   return (
     <>

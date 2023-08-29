@@ -1,45 +1,33 @@
-version: 2.1 # 2.1 config required to use orbs
+version: 2.1
 
 orbs:
-  aws-ecr: circleci/aws-ecr@8.1.2 # use the AWS ECR orb
-  aws-ecs: circleci/aws-ecs@3.2.0 # use the AWS ECS orb
-  aws-cli: circleci/aws-cli@3.1.1 # use the AWS CLI orb
+  aws-s3: circleci/aws-s3@3.1.1 # use the AWS S3 orb in your configuration
 
-jobs:
-  verify-deployment:
-    executor: aws-cli/default
-    steps:
-      - aws-cli/install
-      - aws-cli/setup:
-          aws-access-key-id: AWS_SECRET_ACCESS_KEY_ID
-          aws-region: AWS_DEFAULT_REGION
-          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
-      - run:
-          name: Get last task definition
-          command: >
-            TASK_DEFINITION_ARN=$(aws ecs describe-task-definition \
-                --task-definition ${MY_APP_PREFIX}-service \
-                --output text \
-                --query 'taskDefinition.taskDefinitionArn')
-            echo "export TASK_DEFINITION_ARN='${TASK_DEFINITION_ARN}'" >>
-            "$BASH_ENV"
-      - aws-ecs/verify-revision-is-deployed:
-          family: '${MY_APP_PREFIX}-service'
-          cluster: '${MY_APP_PREFIX}-cluster'
-          task-definition-arn: '${TASK_DEFINITION_ARN}'
-
-workflows:
-  build-and-deploy:
+workflows: # Define a Workflow running the build job, then the deploy job
+  build-deploy: # Make a workflow to build and deploy your project
     jobs:
-      - aws-ecr/build-and-push-image: # orb built-in job
-          repo: '${MY_APP_PREFIX}'
-          tag: '${CIRCLE_SHA1}'
-      - aws-ecs/deploy-service-update: # orb built-in job
+      - build
+      - deploy:
           requires:
-            - aws-ecr/build-and-push-image
-          family: '${MY_APP_PREFIX}-service'
-          cluster: '${MY_APP_PREFIX}-cluster'
-          container-image-name-updates: 'container=${MY_APP_PREFIX}-service,tag=${CIRCLE_SHA1}'
-      - verify-deployment:
-          requires:
-            - aws-ecs/deploy-service-update
+            - build # Only run deploy job once the build job has completed
+          filters:
+            branches:
+              only: main # Only deploy when the commit is on the Main branch
+
+jobs: # Define the build and deploy jobs
+  build:
+    docker: # Use the Docker executor for the build job
+      - image: circleci/node:19 # Specify the Docker image to use for the build job
+    steps:
+      - checkout # build job steps omitted for brevity
+  deploy:
+    docker: # Use the Docker executor for the deploy job
+      - image: <image-name-and-tag>  # Specify the Docker image to use for the deploy job
+    steps:
+      - checkout
+      - aws-s3/sync:
+          from: bucket
+          to: 's3://my-s3-bucket-name/prefix'
+          arguments: | # Optional arguments
+            --acl public-read \
+            --cache-control "max-age=86400"

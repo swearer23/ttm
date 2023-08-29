@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 5000",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -23,9 +23,13 @@
     "typescript": "5.2.2"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.400.0",
+    "@aws-sdk/s3-request-presigner": "^3.400.0",
+    "@aws-sdk/signature-v4-crt": "^3.398.0",
     "archiver": "^6.0.0",
     "autoprefixer": "^10.4.15",
     "axios": "^1.4.0",
+    "dotenv": "^16.3.1",
     "next": "^13.4.19",
     "playwright": "^1.36.2",
     "playwright-core": "^1.37.1",

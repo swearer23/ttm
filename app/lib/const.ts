@@ -1,1 +1,1 @@
-export const outputPath = './public/output/'
+export const outputPath = '/tmp/'
